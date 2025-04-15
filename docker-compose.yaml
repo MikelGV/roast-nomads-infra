@@ -11,9 +11,8 @@ services:
     volumes:
       - psql_volume:/var/lib/postgresql/data
   golang-server:
-    container_name: golang-server
     build:
-      context: ./golang-server
+      context: https://github.com/MikelGV/roast-nomads-client.git
       dockerfile: Dockerfile
     restart: unless-stopped
     ports:
@@ -21,9 +20,8 @@ services:
     depends_on:
       - psql_db
   roast-nomads-client:
-    container_name: roast-nomads-client
     build:
-      context: ./roast-nomads-client
+      context: https://github.com/MikelGV/roast-nomads-client.git
       dockerfile: Dockerfile
       args:
         ENV_VARIABLE: ${ENV_VARIABLE}
