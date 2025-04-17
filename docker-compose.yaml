@@ -3,13 +3,20 @@ services:
     image: postgres:latest
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${DB_DATABASE}
-      POSTGRES_USER: ${DB_USERNAME}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      - POSTGRES_DB: ${DB_DATABASE}
+      - POSTGRES_USER: ${DB_USERNAME}
+      - POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - "${DB_PORT}:5432"
     volumes:
       - psql_volume:/var/lib/postgresql/data
+    networks:
+      - my_network
+    healthcheck:
+      - test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME}"]
+      - interval: 5s
+      - timeout: 5s
+      - retries: 5
   golang-server:
     build:
       context: https://github.com/MikelGV/SpecialtyCoffeeCrawler.git
@@ -17,8 +24,15 @@ services:
     restart: unless-stopped
     ports:
       - 8081:8080
+    environment:
+      - HOST=${HOST}
+      - PORT=${PORT}
+      - JWTSECRETKEY=${JWTSECRETKEY}
     depends_on:
-      - psql_db
+      psql_db:
+        condition: service_healthy
+    networks:
+      - my_network
   roast-nomads-client:
     build:
       context: https://github.com/MikelGV/roast-nomads-client.git
@@ -26,9 +40,11 @@ services:
       args:
         ENV_VARIABLE: ${ENV_VARIABLE}
         NEXT_PUBLIC_ENV_VARIABLE: ${NEXT_PUBLIC_ENV_VARIABLE}
-    restart: always
+    restart: unless-stopped 
     ports:
       - 3000:3000
+    depends_on:
+      - golang-server
     networks:
       - my_network
 
