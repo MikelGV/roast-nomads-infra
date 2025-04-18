@@ -3,9 +3,9 @@ services:
     image: postgres:latest
     restart: unless-stopped
     environment:
-      - POSTGRES_DB: ${DB_DATABASE}
-      - POSTGRES_USER: ${DB_USERNAME}
-      - POSTGRES_PASSWORD: ${DB_PASSWORD}
+      - POSTGRES_DB=${DB_DATABASE}
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
     volumes:
       - psql_volume:/var/lib/postgresql/data
     networks:
@@ -36,8 +36,8 @@ services:
       context: https://github.com/MikelGV/roast-nomads-client.git
       dockerfile: Dockerfile
       args:
-        ENV_VARIABLE: ${ENV_VARIABLE}
-        NEXT_PUBLIC_ENV_VARIABLE: ${NEXT_PUBLIC_ENV_VARIABLE}
+        ENV_VARIABLE=${ENV_VARIABLE}
+        NEXT_PUBLIC_ENV_VARIABLE=${NEXT_PUBLIC_ENV_VARIABLE}
     restart: unless-stopped 
     ports:
       - "3000:3000"
